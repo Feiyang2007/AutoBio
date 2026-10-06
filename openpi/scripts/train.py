@@ -275,6 +275,7 @@ def wrap(config: _config.TrainConfig):
     from openpi.training.config import LeRoboAutoBioDataConfig
     if "SLURM_JOB_ID" not in os.environ or not isinstance(config.data, LeRoboAutoBioDataConfig):
         main(config)
+        return
 
     # Automatically set the experiment name based on the SLURM job ID and some hyperparameters.
     SLURM_JOB_ID = os.environ["SLURM_JOB_ID"]
