@@ -1,5 +1,22 @@
 # AutoBio [Preliminary Version]
 
+> **About this fork**: This repository is a **reproduction and study fork** of the upstream
+> [autobio-bench/AutoBio](https://github.com/autobio-bench/AutoBio) project (2025 pre-release snapshot).
+> All benchmark design, simulation assets, datasets, and the original codebase are credited to the
+> upstream AutoBio team — see their [paper](https://arxiv.org/abs/2505.14030).
+>
+> **Our changes** (this fork only):
+> 1. Fixed 6 stale import paths in `autobio/task.py` so all 12 tasks import again.
+> 2. Fixed a missing `return` in `openpi/scripts/train.py` `wrap()` (KeyError: SLURM_JOB_ID on non-SLURM machines).
+> 3. Bumped `nvidia-cuda-nvcc-cu12` to 12.9.86 in `openpi/uv.lock` (required for RTX 5090 / sm_120).
+> 4. Added `openpi/scripts/export_lora.py` / `load_lora.py` and a standalone `openpi/demo_pi0_infer.py`.
+>
+> **Our result**: π0 LoRA fine-tuned on `thermal_cycler_close` (MuJoCo flavor) reaches **18/20 = 90%**
+> success (5000 steps, batch 16, single RTX 5090 24GB) vs 0% zero-shot. Fine-tuned weights are
+> available at [CloudTugWind/AutoBio-pi0-thermal-cycler-close-lora5k on HuggingFace](https://huggingface.co/CloudTugWind/AutoBio-pi0-thermal-cycler-close-lora5k)
+> (full orbax checkpoint), plus a 100 MB LoRA-only delta on the [GitHub Releases](https://github.com/Feiyang2007/AutoBio/releases/tag/thermal_cycler_close-lora5k).
+> See the "Our fine-tuned checkpoints" section below for usage.
+
 ⚠️ **Note**: This is currently a preliminary version of AutoBio, including our simulation assets and example code for synthetic data generation. The project is in development, and the codebase is undergoing structural improvements. We appreciate your understanding as we work to refine and stabilize the implementation. Contributions and suggestions are welcome! For details, please refer to our paper [AutoBio: A Simulation and Benchmark for Robotic Automation in Digital Biology Laboratory](https://arxiv.org/abs/2505.14030)
 
 This codebase contains the following directories:
@@ -105,11 +122,21 @@ This will run the evaluation and save the results in `result.json`. You can adju
 
 ## Our fine-tuned checkpoints (LoRA)
 
-We provide a π0 LoRA checkpoint fine-tuned on the MuJoCo flavor of `thermal_cycler_close` (100 episodes, 5000 steps, batch 16, single RTX 5090 24GB), reaching **18/20 (90%) success rate** vs 0% zero-shot (π0_base). The full orbax checkpoint is hosted on HuggingFace; the 100MB LoRA delta (20 tensors, bfloat16) is attached to this repo's GitHub releases and loadable without the openpi training stack:
+We provide a π0 LoRA checkpoint fine-tuned on the MuJoCo flavor of `thermal_cycler_close` (100 episodes, 5000 steps, batch 16, single RTX 5090 24GB), reaching **18/20 (90%) success rate** vs 0% zero-shot (π0_base).
+
+**Download the full orbax checkpoint (step 4999, ~4.9 GB)** from HuggingFace:
 
 ```bash
-# Download loras/thermal_cycler_close-lora5k.npz (+ .meta.json) from the Releases page, then:
-cd openpi && uv run python scripts/export_lora.py --help   # how the delta was extracted
+# via huggingface-cli
+huggingface-cli download CloudTugWind/AutoBio-pi0-thermal-cycler-close-lora5k autobio_pi0_tc_close_lora5k_ckpt.tar --local-dir .
+tar -xf autobio_pi0_tc_close_lora5k_ckpt.tar   # -> ./4999/
+```
+
+The 100 MB LoRA-only delta (20 tensors, bfloat16) is attached to this repo's [GitHub Releases](https://github.com/Feiyang2007/AutoBio/releases/tag/thermal_cycler_close-lora5k) and loadable without the openpi training stack:
+
+```bash
+# Download thermal_cycler_close-lora5k.npz (+ .meta.json) from the Releases page, then:
+cd openpi && uv run python scripts/load_lora.py   # see file docstring for usage
 ```
 
 - `scripts/export_lora.py`: extract the trainable LoRA delta from a full openpi checkpoint into a portable `.npz` (bf16 stored as uint16 bit-view).
