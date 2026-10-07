@@ -77,6 +77,11 @@ Fine-tuned weights:
   with `merge_lora_into_params()` from `openpi/scripts/load_lora.py` (or simply use the full
   checkpoint above, which is what `serve_policy.py` consumes directly).
 
+- **Evaluation media (~75 MB)**: rollout videos, charts and raw eval data on HuggingFace Datasets —
+  [`CloudTugWind/AutoBio-pi0-thermal-cycler-close-lora5k-media`](https://huggingface.co/datasets/CloudTugWind/AutoBio-pi0-thermal-cycler-close-lora5k-media).
+  Contains 4 LoRA success rollouts and 4 zero-shot failures recorded on the **same** random seeds
+  (3 camera views each, `ep00`–`ep03` paired), plus the training loss curve and the success-rate chart.
+
 Serve & evaluate (RTX 5090 needs the `XLA_FLAGS` workaround for a JAX/Triton crash):
 
 ```bash
