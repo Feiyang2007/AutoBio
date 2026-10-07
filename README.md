@@ -13,6 +13,22 @@ upstream project; it exists only to (a) repair a few breakages in the frozen ups
 - Upstream note (quoted): *"This is currently a preliminary version of AutoBio ... The project is
   in development, and the codebase is undergoing structural improvements."*
 
+## Environment requirements (read this first)
+
+- **Linux only** (tested on Ubuntu 20.04 / 24.04; WSL2 works). The `autobio` side uses a conda
+  environment; the `openpi` side uses [uv](https://docs.astral.sh/uv/). See each sub-README for setup.
+- **MuJoCo rendering is headless EGL**: export `MUJOCO_GL=egl` (and `MUJOCO_EGL_DEVICE_ID=<gpu>` if
+  you have multiple GPUs) before running collection/evaluation.
+- **RTX 5090 (sm_120) users**: you **must** set
+
+  ```bash
+  export XLA_FLAGS="--xla_gpu_enable_triton_gemm=false"
+  ```
+
+  for **every** openpi command — training, `compute_norm_stats`, and `serve_policy` alike —
+  otherwise JAX/Triton kernel compilation crashes the process on this architecture. The pinned
+  `nvidia-cuda-nvcc-cu12==12.9.86` in `openpi/uv.lock` is likewise required for sm_120.
+
 ## What we changed in this fork
 
 1. `autobio/task.py` — fixed 6 stale import paths so that all 12 tasks import again
