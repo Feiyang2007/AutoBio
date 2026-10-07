@@ -30,11 +30,15 @@ upstream project; it exists only to (a) repair a few breakages in the frozen ups
 π0 LoRA fine-tuned on the MuJoCo flavor of `thermal_cycler_close` (100 episodes, 5000 steps,
 batch 16, one RTX 5090 24GB, ~7.5 h):
 
-| Model | Success rate |
-|---|---|
-| π0_base zero-shot | 0/6 (0%) |
-| **This LoRA (5000 steps)** | **18/20 (90%)** |
-| Upstream paper, π0 full finetune (30k steps, H800 ×1500 GPU-hours) | 99.7% |
+| Model | Episodes | Success rate |
+|---|---|---|
+| π0_base zero-shot (6-episode smoke check) | 6 | 0/6 (0%) |
+| **This LoRA (5000 steps)** | **20, seed 0** | **18/20 (90%)** |
+| Upstream paper, π0 full finetune (30k steps, H800 ×1500 GPU-hours) | 100 × 3 seeds | 99.7 ± 0.3% |
+
+Raw evaluation artifacts are in [`results/`](results/) (`TRAINING_CONFIG.md`, per-episode JSON,
+loss curve CSV) — note the caveats there: single task, single seed, small sample, and *not* an
+apples-to-apples comparison with the upstream full finetune.
 
 Fine-tuned weights:
 
@@ -48,8 +52,10 @@ Fine-tuned weights:
   ```
 
 - **LoRA-only delta (100 MB)**: attached to this repo's
-  [GitHub Releases](https://github.com/Feiyang2007/AutoBio/releases/tag/thermal_cycler_close-lora5k),
-  load with `openpi/scripts/load_lora.py` (extraction code in `openpi/scripts/export_lora.py`).
+  [GitHub Releases](https://github.com/Feiyang2007/AutoBio/releases/tag/thermal_cycler_close-lora5k).
+  The npz stores the `lora_a`/`lora_b` tensors only — to use it, merge them into π0_base weights
+  with `merge_lora_into_params()` from `openpi/scripts/load_lora.py` (or simply use the full
+  checkpoint above, which is what `serve_policy.py` consumes directly).
 
 Serve & evaluate (RTX 5090 needs the `XLA_FLAGS` workaround for a JAX/Triton crash):
 

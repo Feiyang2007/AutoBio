@@ -37,7 +37,8 @@ def main():
     for k, v in lora.items():
         assert v.dtype == np.dtype("bfloat16"), f"unexpected dtype {v.dtype} for {k}"
         # bfloat16 在 numpy 中无原生类型，按位存为 uint16，读取时还原。
-        payload[k] = v.view(np.uint16)
+        # view 要求最后一维连续，先 ascontiguousarray 防止 orbax 还原的非连续数组报错。
+        payload[k] = np.ascontiguousarray(v).view(np.uint16)
         meta[k] = {"shape": list(v.shape), "dtype": "bfloat16"}
     np.savez(out, **payload)
     meta_path = out.with_suffix(".meta.json")
