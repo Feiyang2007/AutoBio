@@ -82,6 +82,16 @@ Fine-tuned weights:
   Contains 4 LoRA success rollouts and 4 zero-shot failures recorded on the **same** random seeds
   (3 camera views each, `ep00`–`ep03` paired), plus the training loss curve and the success-rate chart.
 
+- **ModelScope mirrors** (mainland-China friendly):
+  [model repo](https://modelscope.cn/models/WindTugCloud/AutoBio-pi0-thermal-cycler-close-lora5k) —
+  the full orbax checkpoint already unpacked as `4999/`, alongside the LoRA `npz` delta and its meta;
+  [dataset repo](https://modelscope.cn/datasets/WindTugCloud/AutoBio-pi0-thermal-cycler-close-lora5k-media) —
+  the same evaluation media as the HuggingFace Dataset above.
+
+  ```bash
+  modelscope download --model WindTugCloud/AutoBio-pi0-thermal-cycler-close-lora5k --local_dir ./
+  ```
+
 Serve & evaluate (RTX 5090 needs the `XLA_FLAGS` workaround for a JAX/Triton crash):
 
 ```bash
