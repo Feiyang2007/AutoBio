@@ -102,3 +102,18 @@ Then, you can run `autobio/evaluate.py` to evaluate the model.
 python evaluate.py --port 8000 --task '<task_name>' --num_episodes 100 --image_history 0 --num_workers 0 --render_device_id 0 --save result.json
 ```
 This will run the evaluation and save the results in `result.json`. You can adjust the parameters as needed.
+
+## Our fine-tuned checkpoints (LoRA)
+
+We provide a π0 LoRA checkpoint fine-tuned on the MuJoCo flavor of `thermal_cycler_close` (100 episodes, 5000 steps, batch 16, single RTX 5090 24GB), reaching **18/20 (90%) success rate** vs 0% zero-shot (π0_base). The full orbax checkpoint is hosted on HuggingFace; the 100MB LoRA delta (20 tensors, bfloat16) is attached to this repo's GitHub releases and loadable without the openpi training stack:
+
+```bash
+# Download loras/thermal_cycler_close-lora5k.npz (+ .meta.json) from the Releases page, then:
+cd openpi && uv run python scripts/export_lora.py --help   # how the delta was extracted
+```
+
+- `scripts/export_lora.py`: extract the trainable LoRA delta from a full openpi checkpoint into a portable `.npz` (bf16 stored as uint16 bit-view).
+- `scripts/load_lora.py`: load the `.npz` back as `jnp.bfloat16` arrays.
+
+Note: the LoRA delta contains only the low-rank adapter weights (`lora_a`/`lora_b`); to serve/evaluate you still need the full checkpoint (HuggingFace) or must merge the delta into the base model yourself.
+
