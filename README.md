@@ -16,9 +16,13 @@ upstream project; it exists only to (a) repair a few breakages in the frozen ups
 ## What we changed in this fork
 
 1. `autobio/task.py` — fixed 6 stale import paths so that all 12 tasks import again
-   (`insert`→`transfer_centrifuge_tube`, `screw_loose`→`screw_loosen`,
-   `screw_tighten`→`screw_tighten`, `insert_centrifuge_5430`→`load_centrifuge_5430`,
-   `vortex_mixer`→`mani_vortex_mixer`).
+   (`pickup`→`pickup_centrifuge_tube`, `insert`→`transfer_centrifuge_tube`,
+   `screw_loose_topp`→`screw_loosen`, `screw_tighten_topp`→`screw_tighten`,
+   `insert_centrifuge_5430`→`load_centrifuge_5430`, `vortex_mixer`→`mani_vortex_mixer`).
+   Note: task-module names and HuggingFace dataset IDs don't always match — e.g. the
+   `insert_centrifuge_5430` dataset ("Load centrifuge rotor") maps to the
+   `load_centrifuge_5430` module. Use the task keys accepted by `create_task()` in
+   `autobio/task.py` as the source of truth.
 2. `openpi/scripts/train.py` — added a missing `return` in `wrap()` which raised
    `KeyError: SLURM_JOB_ID` on non-SLURM machines (after checkpoint save; results unaffected).
 3. `openpi/uv.lock` — bumped `nvidia-cuda-nvcc-cu12` to 12.9.86, required for RTX 5090 (sm_120).
@@ -148,5 +152,11 @@ python evaluate.py --port 8000 --task '<task_name>' --num_episodes 100 --image_h
 
 ## License & attribution
 
-The upstream AutoBio code retains its original licensing. Our additions listed in
-"What we changed in this fork" are provided under the same terms for reproduction purposes.
+**Important:** the upstream AutoBio repository does **not** ship a `LICENSE` file, which means its
+code is under default copyright protection ("all rights reserved") by the upstream authors. This
+fork redistributes the upstream snapshot **unaltered in licensing terms, for non-commercial
+reproduction and study purposes only**. If you reuse this repository beyond that scope — or if you
+are an upstream author and object to this redistribution — please open an issue. Code and docs
+added by this fork (the items listed under "What we changed in this fork", plus `results/`) are
+provided under the same terms for the same purpose. The π0 training stack under `openpi/`
+additionally derives from [Physical-Intelligence/openpi](https://github.com/Physical-Intelligence/openpi).
