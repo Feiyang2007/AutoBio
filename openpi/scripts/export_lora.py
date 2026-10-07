@@ -1,8 +1,10 @@
 """导出 LoRA 增量为 npz（bf16 以 uint16 位视图存储）。
 
-usage: cd /home/bio/AutoBio/openpi && JAX_PLATFORMS=cpu .venv/bin/python scripts/export_lora.py \
-    --ckpt checkpoints/thermal_cycler_close-lora/lora5k/4999/params \
-    --out loras/thermal_cycler_close-lora5k.npz
+usage:
+        cd <repo>/openpi
+        uv run scripts/export_lora.py \
+            --ckpt checkpoints/<config>/<exp>/<step>/params \
+            --out loras/<exp>.npz
 """
 import argparse
 import pathlib

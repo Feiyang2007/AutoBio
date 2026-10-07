@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# Experiment artifacts (large; distributed via GitHub Releases / HuggingFace)
+openpi/checkpoints/
+openpi/loras/
+autobio/logs/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
