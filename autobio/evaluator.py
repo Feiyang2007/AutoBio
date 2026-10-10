@@ -247,7 +247,7 @@ class Evaluator:
             while shall_continue():
                 observation = self.get_observation()
                 actions = policy(observation)
-                assert actions.ndim == 2 and actions.shape[1] == len(self.task_info['action_indices']), breakpoint()
+                assert actions.ndim == 2 and actions.shape[1] == len(self.task_info['action_indices']), f"unexpected action shape {actions.shape}"
                 for action in actions:
                     self.data.ctrl[self.task_info['action_indices']] = action
                     self.history_states.append(self.data.qpos)

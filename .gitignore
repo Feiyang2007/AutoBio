@@ -9,6 +9,9 @@ openpi/checkpoints/
 openpi/loras/
 autobio/logs/
 
+# Scratch / local tooling (contains machine-specific absolute paths)
+.scratch/
+
 # Editors / OS
 .vscode/
 .idea/
