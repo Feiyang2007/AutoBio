@@ -12,6 +12,12 @@ autobio/logs/
 # Scratch / local tooling (contains machine-specific absolute paths)
 .scratch/
 
+# Local evaluation rollouts (large recordings; summarized JSONs live in results/)
+eval_results/
+
+# MuJoCo runtime log
+autobio/MUJOCO_LOG.TXT
+
 # Editors / OS
 .vscode/
 .idea/

@@ -60,6 +60,30 @@ Raw evaluation artifacts are in [`results/`](results/) (`TRAINING_CONFIG.md`, pe
 loss curve CSV) — note the caveats there: single task, single seed, small sample, and *not* an
 apples-to-apples comparison with the upstream full finetune.
 
+### Negative result: screw_loose & screw_tighten (5000 steps, dual-arm, contact-rich)
+
+We also ran the same 5000-step LoRA recipe on two harder tasks — `screw_loose` (Medium) and
+`screw_tighten` (Hard), both 14-DoF dual-Aloha, both contact-rich. **Both scored 0/100 in
+closed-loop evaluation (seed 0), and the π0_base zero-shot baseline also scored 0/10 on
+screw_loose. These artifacts are published as an honest negative result — we did not obtain a
+working policy for these two tasks.**
+
+| Model | Task | Episodes | Success |
+|---|---|---|---|
+| This LoRA (step 4999) | screw_loose | 100 (seed 0) | 0/100 (0%) |
+| This LoRA (step 4999) | screw_tighten | 100 (seed 0) | 0/100 (0%) |
+| π0_base zero-shot | screw_loose | 10 (seed 0) | 0/10 (0%) |
+
+We traced the failures and are confident they are **not** evaluation-harness bugs: with `--seed 0`
+the evaluator's initial state is *bit-identical* to training episode 0's first frame and the live
+images match that episode's first video frame; the repo's own scripted `Expert` solves both tasks;
+and fed real dataset observations the LoRA reproduces the expert action to within ~90%. In closed
+loop, however, the policy's first action chunk undershoots the expert (~40%) and the error
+compounds until the gripper never reaches the cap. Shortening the open-loop action horizon did not
+reliably help. Upstream's config default for these tasks is `num_train_steps=30_000`; we stopped at
+5000 and have not yet validated whether longer training closes the gap. Full details, commands and
+numbers: [`results/screw_tasks_TRAINING_CONFIG.md`](results/screw_tasks_TRAINING_CONFIG.md).
+
 Fine-tuned weights:
 
 - **Full orbax checkpoint (~4.9 GB)**:
@@ -91,6 +115,16 @@ Fine-tuned weights:
   ```bash
   modelscope download --model WindTugCloud/AutoBio-pi0-thermal-cycler-close-lora5k --local_dir ./
   ```
+
+- **screw_loose / screw_tighten (negative result, 0/100)**: the full ~4.9 GB orbax checkpoints are
+  on HuggingFace as
+  [`CloudTugWind/AutoBio-pi0-screw-loose-lora5k`](https://huggingface.co/CloudTugWind/AutoBio-pi0-screw-loose-lora5k)
+  and
+  [`CloudTugWind/AutoBio-pi0-screw-tighten-lora5k`](https://huggingface.co/CloudTugWind/AutoBio-pi0-screw-tighten-lora5k),
+  with the 100 MB LoRA `npz` deltas attached to this repo's
+  [GitHub Releases](https://github.com/Feiyang2007/AutoBio/releases). These are published for
+  reproducibility only — **they do not solve the tasks in closed loop** (see the negative-result
+  section above).
 
 Serve & evaluate (RTX 5090 needs the `XLA_FLAGS` workaround for a JAX/Triton crash):
 
